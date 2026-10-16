@@ -44,3 +44,8 @@ PASS - New password works · 200
 
 40/40 checks passed
 ```
+
+## Live demo verification — https://nour-coches.onrender.com (2026-10-16, after demo-dataset revision, commit 8c3d031)
+- Demo banner present on the public home page; admin shows the DÉMO badge.
+- Public API statuses == admin dashboard counts: 12 vehicles → 6 AVAILABLE, 3 RESERVED, 2 RENTED, 1 MAINTENANCE; 1 overdue alert (Golf, NC-DEMO-103).
+- Presentation journey on production: public booking on NCV-0006 Duster (2 days + GPS = 660 MAD) → pending, visible in admin → confirm → vehicle RESERVED with the booking ref → cancel → POST /api/admin/reset-demo → canonical dataset restored (8 bookings, test booking gone, counts identical).

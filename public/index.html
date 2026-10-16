@@ -100,9 +100,50 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
 @media(max-width:960px){.fleet{grid-template-columns:repeat(2,1fr)}.svc{grid-template-columns:repeat(2,1fr)}.searchbar{grid-template-columns:1fr 1fr}.hero-grid{grid-template-columns:1fr}}
 @media(max-width:820px){nav{display:none}.rs-grid{grid-template-columns:1fr}.rs-sum{position:static}}
 @media(max-width:560px){.fleet,.svc{grid-template-columns:1fr}.rs-2,.rs-3,.extras{grid-template-columns:1fr}.searchbar{grid-template-columns:1fr}}
+/* ===== couche « Websites in 2026 » : preloader, curseur, grain, marquee, film scroll, 3D ===== */
+#preloader{position:fixed;inset:0;z-index:1000;background:#07080a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .7s,visibility .7s}
+#preloader.done{opacity:0;visibility:hidden}
+#preloader .plogo{font-family:'Archivo';font-weight:900;font-size:clamp(30px,6vw,52px)}#preloader .plogo b{color:var(--acc)}
+#preloader .pbar{width:min(300px,70vw);height:3px;background:#22242c;border-radius:99px;overflow:hidden}
+#preloader .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .25s}
+#preloader .pnum{font-family:'Archivo';color:var(--acc2);font-size:14px;letter-spacing:3px}
+#progressBar{position:fixed;top:33px;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));z-index:390}
+.grain{position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:250;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 8s steps(10) infinite}
+@keyframes grain{0%,100%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}60%{transform:translate(-2%,-2%)}80%{transform:translate(3%,3%)}}
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;pointer-events:none;z-index:900;border-radius:50%;transform:translate(-50%,-50%)}
+.cursor-dot{width:7px;height:7px;background:var(--acc2)}
+.cursor-ring{width:36px;height:36px;border:1.5px solid rgba(246,162,30,.65);transition:width .25s,height .25s,border-color .25s}
+.cursor-ring.grow{width:58px;height:58px;border-color:rgba(255,198,92,.95)}
+@media(pointer:coarse){.cursor-dot,.cursor-ring{display:none}}
+.marquee{background:#0a0b0e;border-top:1px solid #3a2f14;border-bottom:1px solid #3a2f14;overflow:hidden;padding:15px 0;position:relative;z-index:2}
+.marquee .track{display:flex;gap:0;width:max-content;animation:mq 26s linear infinite}
+.marquee span{font-family:'Archivo';font-weight:800;font-size:16px;letter-spacing:2.5px;color:#e9dfc8;white-space:nowrap;padding:0 26px}
+.marquee span i{color:var(--acc);font-style:normal}
+@keyframes mq{to{transform:translateX(-50%)}}
+.rv{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.fleet{perspective:1400px}
+.car{transform-style:preserve-3d;will-change:transform}
+.vfloat.tilt-on{animation:none}
+.vcard .vglare{position:absolute;inset:0;background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(255,214,120,.20),transparent 45%);mix-blend-mode:screen;pointer-events:none}
+.film{position:relative;height:340vh;background:#050506}
+.film-pin{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.film-pin canvas{position:absolute;inset:0;width:100%;height:100%}
+.film-shade{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.55) 100%);pointer-events:none}
+.fcap{position:absolute;z-index:3;text-align:center;padding:0 22px;opacity:0;transform:translateY(26px);transition:opacity .5s,transform .5s;pointer-events:none;width:100%}
+.fcap.on{opacity:1;transform:none}
+.fcap .eyebrow{margin-bottom:10px}
+.fcap h3{font-family:'Archivo';font-weight:900;font-size:clamp(30px,5.4vw,58px);text-transform:uppercase;line-height:1.05;text-shadow:0 6px 30px rgba(0,0,0,.8)}
+.fcap p{color:#e8e2d2;font-size:clamp(15px,2vw,19px);margin-top:10px;text-shadow:0 3px 14px rgba(0,0,0,.9)}
+.film-prog{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);width:min(340px,70vw);height:3px;background:rgba(255,255,255,.18);border-radius:99px;z-index:3}
+.film-prog i{display:block;height:100%;width:0;background:var(--acc2);border-radius:99px}
+@media(prefers-reduced-motion:reduce){.vfloat,.marquee .track,.grain{animation:none}.rv{opacity:1;transform:none;transition:none}}
 </style>
 </head>
 <body>
+<div id="preloader"><div class="plogo">NOUR <b>COCHES</b></div><div class="pbar"><i id="plBar"></i></div><div class="pnum" id="plNum">0%</div></div>
+<div class="cursor-dot" id="cDot"></div><div class="cursor-ring" id="cRing"></div>
+<div class="grain"></div><div id="progressBar"></div>
 <div id="demoBar">🚧 SITE DE DÉMONSTRATION — موقع تجريبي · Données fictives, aucune réservation réelle · Demo by VERTEX WEB</div>
 <header id="hdr"><div class="bar">
   <a class="logo" href="#">NOUR <b>COCHES</b><small data-i="tagline">LOCATION DE VOITURES · TANGER</small></a>
@@ -123,8 +164,9 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
         <h1>NOUR<br><span class="stroke">COCHES</span></h1>
         <p class="tag" data-i="hero_tag">Disponibilités <b>réelles</b>, prix <b>instantanés</b> — réservez votre voiture à Tanger en une minute, <b>24h/24</b>.</p>
       </div>
-      <div class="stage3d"><div class="vfloat"><div class="vcard">
+      <div class="stage3d"><div class="vfloat" id="vfloat"><div class="vcard" id="vcard">
         <video muted loop playsinline autoplay preload="auto" poster="/assets/hero-poster.webp"><source src="/assets/hero.mp4" type="video/mp4"></video>
+        <div class="vglare"></div>
         <div class="vchip">MERCEDES CLASSE G · 60 FPS</div>
       </div></div></div>
     </div>
@@ -138,7 +180,9 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
   </div>
 </section>
 
-<section class="sec" id="flotte" style="padding-top:20px">
+<div class="marquee" aria-hidden="true"><div class="track" id="mqTrack"></div></div>
+
+<section class="sec" id="flotte" style="padding-top:56px">
   <div class="wrap">
     <p class="eyebrow" data-i="fleet_eye">La flotte</p>
     <h2 class="big"><span data-i="fleet_t1">Des voitures récentes,</span><br><span class="u" data-i="fleet_t2">un stock réel.</span></h2>
@@ -150,6 +194,17 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
       <div class="f"><label data-i="sort">TRI</label><select id="fSort"><option value="price">Prix croissant</option><option value="price_desc">Prix décroissant</option></select></div>
     </div>
     <div class="fleet" id="fleet"><p class="sub">Chargement de la flotte…</p></div>
+  </div>
+</section>
+
+<section class="film" id="film">
+  <div class="film-pin">
+    <canvas id="filmCv"></canvas>
+    <div class="film-shade"></div>
+    <div class="fcap" data-cap="0"><p class="eyebrow">L'expérience Nour Coches</p><h3>Faites défiler</h3><p>Le film se pilote au scroll — comme une télécommande.</p></div>
+    <div class="fcap" data-cap="1"><p class="eyebrow">Icône</p><h3>Mercedes Classe G</h3><p>Le véhicule signature de l'agence, filmé en 60 images/seconde.</p></div>
+    <div class="fcap" data-cap="2"><p class="eyebrow">Prêt à partir</p><h3>Réservez la vôtre</h3><p>Choisissez vos dates — la disponibilité est réelle, en direct du parc.</p></div>
+    <div class="film-prog"><i id="filmProg"></i></div>
   </div>
 </section>
 
@@ -346,6 +401,76 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
   });
   var hdr=document.getElementById('hdr');
   addEventListener('scroll',function(){hdr.classList.toggle('scrolled',scrollY>40);},{passive:true});
+
+  /* ===== couche « Websites in 2026 » ===== */
+  var finePointer=matchMedia('(pointer:fine)').matches, reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* marquee */
+  (function(){var items='NOUR COCHES <i>✦</i> LOCATION PREMIUM <i>✦</i> TANGER <i>✦</i> OUVERT 24/7 <i>✦</i> AÉROPORT IBN BATTOUTA <i>✦</i> RÉSERVATION EN LIGNE <i>✦</i> ';var half='<span>'+items+'</span>';$('mqTrack').innerHTML=half+half;})();
+  /* barre de progression */
+  var pBar=$('progressBar');
+  addEventListener('scroll',function(){var h=document.documentElement;var p=h.scrollTop/(h.scrollHeight-h.clientHeight||1);pBar.style.width=(p*100)+'%';},{passive:true});
+  /* curseur or */
+  if(finePointer&&!reduced){
+    var dot=$('cDot'),ring=$('cRing'),mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+    addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+    (function loop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+    document.addEventListener('mouseover',function(e){if(e.target.closest('a,button,.car,select,input,label'))ring.classList.add('grow');});
+    document.addEventListener('mouseout',function(e){if(e.target.closest('a,button,.car,select,input,label'))ring.classList.remove('grow');});
+  } else { $('cDot').style.display='none'; $('cRing').style.display='none'; }
+  /* tilt 3D — hero */
+  var stage=document.querySelector('.stage3d'),vfloat=$('vfloat'),vcard=$('vcard');
+  if(finePointer&&!reduced&&stage){
+    stage.addEventListener('mousemove',function(e){
+      var r=stage.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      vfloat.classList.add('tilt-on');
+      vfloat.style.transform='rotateY('+(x*17)+'deg) rotateX('+(-y*13)+'deg)';
+      vcard.style.setProperty('--mx',((x+.5)*100)+'%');vcard.style.setProperty('--my',((y+.5)*100)+'%');
+    });
+    stage.addEventListener('mouseleave',function(){vfloat.classList.remove('tilt-on');vfloat.style.transform='';});
+  }
+  /* tilt 3D — cartes véhicules (délégué, survit aux re-rendus) */
+  function bindCard(card){
+    if(card.__tilt||!finePointer||reduced)return;card.__tilt=1;
+    card.addEventListener('mousemove',function(e){
+      var r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+      card.style.transform='rotateY('+(x*7)+'deg) rotateX('+(-y*6)+'deg) translateY(-5px)';
+    });
+    card.addEventListener('mouseleave',function(){card.style.transform='';});
+  }
+  /* révélations au scroll */
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12});
+  function watchRv(scope){(scope||document).querySelectorAll('.rv:not(.in)').forEach(function(el){io.observe(el);});}
+  document.querySelectorAll('h2.big,.sec .eyebrow,.sec .sub,.svc .card,.rs-grid,.searchbar').forEach(function(el){el.classList.add('rv');});
+  watchRv(document);
+  new MutationObserver(function(){document.querySelectorAll('#fleet .car').forEach(function(c){c.classList.add('rv');bindCard(c);});watchRv($('fleet'));}).observe($('fleet'),{childList:true});
+  /* film scroll — séquence canvas pilotée par le scroll */
+  var FRAMES=106,frames=[],loadedN=0,filmP={cur:0,tgt:0};
+  var cv=$('filmCv'),ctx=cv.getContext('2d');
+  function sizeCv(){var d=Math.min(devicePixelRatio||1,2);cv.width=cv.clientWidth*d;cv.height=cv.clientHeight*d;}
+  sizeCv();addEventListener('resize',sizeCv);
+  function drawFr(img){
+    if(!img||!img.naturalWidth)return;
+    var cw=cv.width,ch=cv.height,s=Math.max(cw/img.naturalWidth,ch/img.naturalHeight),w=img.naturalWidth*s,h=img.naturalHeight*s;
+    ctx.clearRect(0,0,cw,ch);ctx.drawImage(img,(cw-w)/2,(ch-h)/2,w,h);
+  }
+  var plBar=$('plBar'),plNum=$('plNum'),plDone=false;
+  function plProgress(){var p=Math.round(loadedN/FRAMES*100);plBar.style.width=p+'%';plNum.textContent=p+'%';
+    if(p>=100&&!plDone){plDone=true;setTimeout(function(){$('preloader').classList.add('done');},350);}}
+  for(var fi=1;fi<=FRAMES;fi++){var im=new Image();im.onload=im.onerror=function(){loadedN++;if(loadedN===1)drawFr(frames[0]);plProgress();};im.src='/assets/seq/f'+String(fi).padStart(3,'0')+'.webp';frames.push(im);}
+  setTimeout(function(){if(!plDone){plDone=true;$('preloader').classList.add('done');}},4500); /* ne jamais bloquer le site */
+  var filmSec=$('film'),caps=document.querySelectorAll('.fcap'),fProg=$('filmProg');
+  function filmTick(){
+    var r=filmSec.getBoundingClientRect(),total=filmSec.offsetHeight-innerHeight;
+    var p=Math.min(1,Math.max(0,-r.top/(total||1)));
+    filmP.tgt=p*(FRAMES-1);filmP.cur+=(filmP.tgt-filmP.cur)*.14;
+    var idx=Math.round(filmP.cur);
+    if(frames[idx]&&frames[idx].complete&&frames[idx].naturalWidth)drawFr(frames[idx]);
+    fProg.style.width=(p*100)+'%';
+    var cap=p<.34?0:(p<.7?1:2);
+    caps.forEach(function(c,i){c.classList.toggle('on',i===cap&&r.top<innerHeight&&r.bottom>0);});
+    requestAnimationFrame(filmTick);
+  }
+  requestAnimationFrame(filmTick);
   load();
 })();
 </script>
