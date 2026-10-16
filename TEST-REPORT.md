@@ -34,3 +34,16 @@ PASS - New password works · 200
 
 30/30 checks passed
 ```
+
+## Live verification — https://nour-coches.onrender.com (2026-10-16, production)
+- GET / → 200 · GET /admin → 200 · hero video byte-identical (1,358,523 B)
+- GET /api/vehicles → 12 seeded vehicles, confirmation_mode = manual
+- Unauthenticated /api/admin/stats → 401
+- Admin login (env-created account) → 200; stats: 12 AVAILABLE, 0 open bookings
+- Live write smoke test: public booking on NCV-0001 (2 days × 200 = 400 MAD, pending)
+  → admin confirm 200 → range blocked for the public (available_for_range=false)
+  → admin cancel 200 → range free again. Residue: that single cancelled booking
+  remains in the admin history as the live-test trace.
+- Note: the first Render deploy booted before env vars were attached (create-payload
+  envVars were ignored by the API) and generated a random admin password; fixed by
+  PUT /env-vars + redeploy — the database re-seeded cleanly with the env credentials.
