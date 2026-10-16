@@ -1,7 +1,9 @@
-# NOUR COCHES — Fleet Management & Booking Platform
+# NOUR COCHES — Fleet Management & Booking Platform (CLIENT DEMO)
 
-Complete vehicle fleet management + online booking platform for NOUR COCHES
-(car rental & sales, Jirari 1, Tangier). Built by **VERTEX WEB**.
+> **Demonstration environment.** All data is fictional sample data (vehicles with
+> `DEMO-xxxx` plates, customers marked « (démo) », references `NC-DEMO-xxx`).
+> No real bookings, payments or notifications are processed. Built by **VERTEX WEB**
+> as a client presentation demo for NOUR COCHES (car rental, Jirari 1, Tangier).
 
 - **Public site** (`/`): the agency's existing dark/gold branding, hero video (60 FPS
   Classe G), live fleet from the database, real availability per date range, filters
@@ -35,21 +37,27 @@ The password can later be changed from Admin → Paramètres.
   sends it; nothing is claimed auto-sent). Email notifications are logged as
   `not_configured` until SMTP host/user are set.
 
-## Data honesty
-The 12 seeded vehicles are the models from the agency's own posts, flagged
-`seed_demo` with placeholder prices and no plates. The admin dashboard lists every
-incomplete record until the administrator enters the real plate, year and price —
-the public site never exposes plates or private documents.
+## Demo data & reset
+First boot seeds a coherent demo dataset: 12 demo vehicles (complete fictional
+specs), 8 sample bookings (completed / active / overdue / confirmed / pending),
+3 maintenance entries and matching notifications — every dashboard statistic is
+computed from these records, so they always agree. Sample dates are relative to
+the seed day, so the demo never looks stale.
+**Reset:** Admin → Paramètres → « Réinitialiser les données de démo » restores the
+canonical dataset. Settings and the admin account are never touched by a reset.
+Credentials are provided only through environment variables — none exist in this
+repository.
 
 ## Tests
 ```bash
-node server.js &  # on port 8932
-python3 test/workflow-test.py http://localhost:8932
+ADMIN_EMAIL=admin@exemple.ma ADMIN_PASSWORD='…' node server.js &  # port 8932
+NOUR_ADMIN_PASSWORD='…' python3 test/workflow-test.py http://localhost:8932
 ```
-30 end-to-end checks: auth rejection, Mercedes add/price/publish, booking totals,
+End-to-end checks: auth rejection, Mercedes add/price/publish, booking totals,
 pending vs confirmed blocking, 409 on overlap (confirm-time and auto mode), pickup →
 RENTED, extension repricing, completion → available, cancellation, maintenance
-blocking, history preservation, password change. See `TEST-REPORT.md`.
+blocking, history preservation, demo-stat coherence, reset behaviour, password
+change. See `TEST-REPORT.md`.
 
 ## Production note
 SQLite lives on local disk (`data/nour.sqlite`). On hosts with an ephemeral

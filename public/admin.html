@@ -59,7 +59,8 @@ h2.sec{font-size:21px;margin:22px 0 12px}
 <body>
 <div id="login">
   <h1>NOUR <b>COCHES</b> — Admin</h1>
-  <p class="note" style="margin-bottom:18px">Gestion de flotte & réservations. Accès réservé à l'administrateur.</p>
+  <p class="note" style="margin-bottom:6px">Gestion de flotte & réservations. Accès réservé à l'administrateur.</p>
+  <p style="background:#1d1408;border:1px solid #4a3a12;color:#ffd977;border-radius:10px;padding:10px 13px;font-size:13.5px;font-weight:700;margin-bottom:18px">🚧 Environnement de DÉMONSTRATION — toutes les données (véhicules, clients, réservations) sont fictives.</p>
   <div class="field"><label>EMAIL</label><input type="email" id="liEmail" autocomplete="username"></div>
   <div class="field"><label>MOT DE PASSE</label><input type="password" id="liPass" autocomplete="current-password"></div>
   <button class="btn" id="liBtn" style="width:100%">Se connecter</button>
@@ -68,7 +69,7 @@ h2.sec{font-size:21px;margin:22px 0 12px}
 
 <div id="app">
   <div class="topbar"><div class="in">
-    <span class="logo">NOUR <b>COCHES</b> · Admin</span>
+    <span class="logo">NOUR <b>COCHES</b> · Admin <span class="pill" style="background:#2b2108;color:#ffd977;font-size:12px;vertical-align:middle">🚧 DÉMO</span></span>
     <span><span id="who" class="note"></span> <button class="btn ghost sm" id="logoutBtn">Déconnexion</button></span>
   </div>
   <div class="tabs" id="tabs">
@@ -343,9 +344,14 @@ h2.sec{font-size:21px;margin:22px 0 12px}
       +'<div class="field"><label>CATALOGUE D\u2019OPTIONS (JSON : [{"name":"GPS","price":30},…])</label><textarea id="st_extras" rows="3"></textarea></div>'
       +'<button class="btn" id="stSave">Enregistrer les paramètres</button> <span class="note" id="stMsg"></span>'
       +'<p class="note" style="margin-top:16px">Sécurité : les mots de passe SMTP ne sont jamais demandés ici — configurez-les côté serveur (variables d\u2019environnement) lors du déploiement.</p>'
+      +'<h2 class="sec">Zone démonstration</h2><p class="note" style="margin-bottom:10px">Après une présentation client, restaurez le jeu de données d\u2019exemple initial (véhicules, réservations, clients, maintenance). La configuration et le compte admin ne sont pas touchés.</p><button class="btn red" id="resetBtn">♻️ Réinitialiser les données de démo</button> <span class="note" id="resetMsg"></span>'
       +'<h2 class="sec">Changer le mot de passe admin</h2><div class="grid2"><div class="field"><label>ACTUEL</label><input type="password" id="pw_cur"></div><div class="field"><label>NOUVEAU (8+ caractères)</label><input type="password" id="pw_new"></div></div><button class="btn ghost" id="pwBtn">Changer le mot de passe</button> <span class="note" id="pwMsg"></span>';
       $('pwBtn').addEventListener('click',function(){
         api('/api/admin/change-password','POST',{current_password:$('pw_cur').value,new_password:$('pw_new').value}).then(function(x){$('pwMsg').textContent=x.ok?'✅ Mot de passe changé':'⚠️ '+(x.d.detail||x.d.error);});
+      });
+      $('resetBtn').addEventListener('click',function(){
+        if(!confirm('Réinitialiser les données de démonstration ?\n\nLe parc, les réservations, les clients et la maintenance reviennent au jeu d\u2019exemple initial.\nLa configuration et le compte admin sont conservés.'))return;
+        api('/api/admin/reset-demo','POST',{}).then(function(x){$('resetMsg').textContent=x.ok?'✅ Données de démonstration restaurées':'⚠️ '+(x.d.detail||x.d.error);if(x.ok)loadAll();});
       });
       $('st_mode').value=s.confirmation_mode;$('st_wa').value=s.whatsapp_number;$('st_name').value=s.agency_name;
       $('st_host').value=s.smtp_host;$('st_port').value=s.smtp_port;$('st_user').value=s.smtp_user;$('st_from').value=s.smtp_from;

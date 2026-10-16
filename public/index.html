@@ -13,7 +13,8 @@
 body{background:var(--bg);color:var(--txt);font-family:'Cairo',Tahoma,sans-serif;overflow-x:hidden}
 img{display:block;max-width:100%}a{color:inherit;text-decoration:none}
 .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
-header{position:fixed;top:0;left:0;right:0;z-index:300;transition:.3s}
+#demoBar{position:fixed;top:0;left:0;right:0;z-index:400;background:repeating-linear-gradient(45deg,#1d1408,#1d1408 14px,#241a0a 14px,#241a0a 28px);border-bottom:1px solid #4a3a12;color:#ffd977;text-align:center;font-size:12.5px;font-weight:800;letter-spacing:.6px;padding:7px 10px}
+header{position:fixed;top:33px;left:0;right:0;z-index:300;transition:.3s}
 header.scrolled{background:rgba(7,8,10,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 header .bar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;max-width:1180px;margin:0 auto;gap:12px}
 .logo{font-family:'Archivo';font-weight:900;font-size:21px}.logo b{color:var(--acc)}
@@ -26,7 +27,7 @@ nav a:hover{color:#fff}
 .btn-ghost{background:transparent;border:1px solid #55565e;color:#fff}
 .btn-sm{padding:9px 16px;font-size:14px}
 .eyebrow{color:var(--acc2);font-weight:800;letter-spacing:4px;font-size:12.5px;text-transform:uppercase}
-.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:90px}
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-top:126px}
 .hero .bg{position:absolute;inset:0}.hero .bg video{width:100%;height:100%;object-fit:cover;filter:blur(30px) brightness(.42) saturate(1.15);transform:scale(1.3)}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,8,10,.6),rgba(7,8,10,.15) 40%,rgba(7,8,10,.9) 85%,var(--bg))}
 .hero .inner{position:relative;z-index:2;padding:40px 0 40px;width:100%}
@@ -102,6 +103,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
 </style>
 </head>
 <body>
+<div id="demoBar">🚧 SITE DE DÉMONSTRATION — موقع تجريبي · Données fictives, aucune réservation réelle · Demo by VERTEX WEB</div>
 <header id="hdr"><div class="bar">
   <a class="logo" href="#">NOUR <b>COCHES</b><small data-i="tagline">LOCATION DE VOITURES · TANGER</small></a>
   <nav><a href="#flotte" data-i="nav_fleet">LA FLOTTE</a><a href="#reservation" data-i="nav_book">RÉSERVER</a><a href="#services" data-i="nav_svc">SERVICES</a><a href="#suivi" data-i="nav_track">SUIVI</a></nav>
@@ -140,7 +142,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
   <div class="wrap">
     <p class="eyebrow" data-i="fleet_eye">La flotte</p>
     <h2 class="big"><span data-i="fleet_t1">Des voitures récentes,</span><br><span class="u" data-i="fleet_t2">un stock réel.</span></h2>
-    <p class="sub" data-i="fleet_sub">Chaque voiture ci-dessous est un véhicule physique de l'agence, avec son propre calendrier. Le statut et le prix pour vos dates sont calculés en direct.</p>
+    <p class="sub" data-i="fleet_sub">Chaque voiture ci-dessous est un véhicule de démonstration avec son propre calendrier. Le statut et le prix pour vos dates sont calculés en direct par le système.</p>
     <div class="filters">
       <div class="f"><label data-i="transmission">BOÎTE</label><select id="fTrans"><option value="">Toutes</option><option>Manuelle</option><option>Automatique</option></select></div>
       <div class="f"><label data-i="fuel">CARBURANT</label><select id="fFuel"><option value="">Tous</option><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Électrique</option></select></div>
@@ -156,6 +158,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
     <p class="eyebrow" data-i="book_eye">Réservation en ligne</p>
     <h2 class="big"><span data-i="book_t">Réservez en</span> <span class="u">1 minute</span>.</h2>
     <p class="sub" data-i="book_sub">Le serveur revérifie la disponibilité au moment de l'envoi : aucun double booking n'est possible.</p>
+    <p class="note">🧪 <b>Environnement de démonstration</b> : votre demande est enregistrée dans l'espace démo et visible dans le tableau de bord admin — sans engagement réel et sans paiement.</p>
     <div class="rs-grid">
       <form class="rs-form" id="rsForm" novalidate>
         <h3 data-i="yourcar">Votre voiture & dates</h3>
@@ -332,7 +335,7 @@ footer{border-top:1px solid var(--line);padding:28px 0 90px;color:var(--mut);fon
     });
   });
   /* FR / AR toggle (main strings) */
-  var AR={'tagline':'كراء السيارات · طنجة','nav_fleet':'الأسطول','nav_book':'احجز','nav_svc':'الخدمات','nav_track':'تتبع','hero_eye':'وكالة كراء · الجيراري 1 — طنجة','hero_tag':'التوفر <b>الحقيقي</b> والثمن <b>المباشر</b> — احجز سيارتك في طنجة في دقيقة، <b>24/7</b>.','pickup':'الانطلاق','return':'الرجوع','brand':'الماركة','seats':'المقاعد على الأقل','search':'ابحث','fleet_eye':'الأسطول','fleet_t1':'سيارات حديثة،','fleet_t2':'ومخزون حقيقي.','fleet_sub':'كل سيارة هنا مركبة حقيقية عند الوكالة، بتقويمها الخاص. الحالة والثمن لتواريخك كيتحسبو مباشرة.','transmission':'علبة السرعة','fuel':'الوقود','maxprice':'أقصى ثمن / يوم','sort':'الترتيب','book_eye':'الحجز عبر الإنترنت','book_t':'احجز في','book_sub':'الخادم كيعاود يتحقق من التوفر لحظة الإرسال: الحجز المزدوج مستحيل.','yourcar':'سيارتك والتواريخ','model':'الموديل','location':'مكان الاستلام','options':'الإضافات','yourinfo':'معلوماتك','name':'الاسم الكامل *','phone':'الهاتف *','notes':'ملاحظة','total':'المجموع','confirm':'أرسل الحجز','nopay':'بلا دفع إلكتروني: كتخلص عند الاستلام.','track_eye':'التتبع','track_t':'حجزك','ref':'المرجع','track_btn':'تحقق من الحالة','ok_note':'احتفظ بهذا المرجع. الوكالة كتأكد في واتساب — ولا تتبع طلبك في قسم التتبع لتحت.','ok_wa':'خبر الوكالة في واتساب'};
+  var AR={'tagline':'كراء السيارات · طنجة','nav_fleet':'الأسطول','nav_book':'احجز','nav_svc':'الخدمات','nav_track':'تتبع','hero_eye':'وكالة كراء · الجيراري 1 — طنجة','hero_tag':'التوفر <b>الحقيقي</b> والثمن <b>المباشر</b> — احجز سيارتك في طنجة في دقيقة، <b>24/7</b>.','pickup':'الانطلاق','return':'الرجوع','brand':'الماركة','seats':'المقاعد على الأقل','search':'ابحث','fleet_eye':'الأسطول','fleet_t1':'سيارات حديثة،','fleet_t2':'ومخزون حقيقي.','fleet_sub':'كل سيارة هنا مركبة تجريبية عندها تقويمها الخاص. الحالة والثمن لتواريخك كيتحسبو مباشرة من النظام.','transmission':'علبة السرعة','fuel':'الوقود','maxprice':'أقصى ثمن / يوم','sort':'الترتيب','book_eye':'الحجز عبر الإنترنت','book_t':'احجز في','book_sub':'الخادم كيعاود يتحقق من التوفر لحظة الإرسال: الحجز المزدوج مستحيل.','yourcar':'سيارتك والتواريخ','model':'الموديل','location':'مكان الاستلام','options':'الإضافات','yourinfo':'معلوماتك','name':'الاسم الكامل *','phone':'الهاتف *','notes':'ملاحظة','total':'المجموع','confirm':'أرسل الحجز','nopay':'بلا دفع إلكتروني: كتخلص عند الاستلام.','track_eye':'التتبع','track_t':'حجزك','ref':'المرجع','track_btn':'تحقق من الحالة','ok_note':'احتفظ بهذا المرجع. الوكالة كتأكد في واتساب — ولا تتبع طلبك في قسم التتبع لتحت.','ok_wa':'خبر الوكالة في واتساب'};
   var FR={}, cur='fr';
   document.querySelectorAll('[data-i]').forEach(function(el){FR[el.dataset.i]=el.innerHTML;});
   $('langBtn').addEventListener('click',function(){

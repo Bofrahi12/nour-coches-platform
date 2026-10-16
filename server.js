@@ -99,36 +99,69 @@ function hashPass(password, salt) {
   console.log('============================================================');
 })();
 
-/* ---------- seed fleet (models verified from the agency's own posts;
-   plates & exact prices are demo placeholders flagged seed_demo=1) ---------- */
-(function seedFleet() {
-  const count = db.prepare('SELECT COUNT(*) c FROM vehicles').get().c;
-  if (count > 0) return;
+/* ---------- DEMO dataset (presentation only) ----------
+   Models from the agency's own posts; every other field is fictional sample data,
+   clearly identified: plates DEMO-xxxx, customers "(démo)", refs NC-DEMO-xxx.
+   Dates are relative to seed day so the dashboard is always coherent. */
+function dayAt(offset, hour = 10) {
+  const d = new Date(); d.setDate(d.getDate() + offset); d.setHours(hour, 0, 0, 0);
+  return d.toISOString().slice(0, 16);
+}
+function seedDemoData() {
   const now = new Date().toISOString();
   const fleet = [
-    ['Renault','Clio','5',null,'Citadine','Manuelle','Essence',5,5,'clio',200],
-    ['Peugeot','208','',null,'Citadine','Manuelle','Essence',5,5,'p208',200],
-    ['Renault','Captur','',null,'SUV compact','Manuelle','Essence',5,5,'captur',250],
-    ['Volkswagen','Golf','8',null,'Compacte','Manuelle','Diesel',5,5,'golf',300],
-    ['SEAT','León','',null,'Compacte','Manuelle','Diesel',5,5,'leon',300],
-    ['Dacia','Duster','',null,'SUV','Manuelle','Diesel',5,5,'duster',300],
-    ['Volkswagen','T-Roc','R-Line',null,'SUV','Automatique','Essence',5,5,'troc',400],
-    ['Volkswagen','Tiguan','',null,'SUV familial','Automatique','Diesel',5,5,'tiguan',400],
-    ['Hyundai','Tucson','',2026,'SUV','Automatique','Hybride',5,5,'tucson',450],
-    ['Peugeot','3008','GT Line',null,'SUV Premium','Automatique','Diesel',5,5,'p3008',450],
-    ['Toyota','RAV4','',null,'SUV Premium','Automatique','Hybride',5,5,'rav4',500],
-    ['Kia','EV6','',null,'Électrique','Automatique','Électrique',5,5,'ev6',600]
+    ['Renault','Clio','5',2023,38500,'Citadine','Manuelle','Essence',5,5,'clio',200],
+    ['Peugeot','208','',2023,41200,'Citadine','Manuelle','Essence',5,5,'p208',200],
+    ['Renault','Captur','',2022,53800,'SUV compact','Manuelle','Essence',5,5,'captur',250],
+    ['Volkswagen','Golf','8',2022,47600,'Compacte','Manuelle','Diesel',5,5,'golf',300],
+    ['SEAT','León','',2023,35900,'Compacte','Manuelle','Diesel',5,5,'leon',300],
+    ['Dacia','Duster','',2024,28400,'SUV','Manuelle','Diesel',5,5,'duster',300],
+    ['Volkswagen','T-Roc','R-Line',2023,33100,'SUV','Automatique','Essence',5,5,'troc',400],
+    ['Volkswagen','Tiguan','',2023,44900,'SUV familial','Automatique','Diesel',5,5,'tiguan',400],
+    ['Hyundai','Tucson','',2026,12300,'SUV','Automatique','Hybride',5,5,'tucson',450],
+    ['Peugeot','3008','GT Line',2023,39700,'SUV Premium','Automatique','Diesel',5,5,'p3008',450],
+    ['Toyota','RAV4','',2024,21800,'SUV Premium','Automatique','Hybride',5,5,'rav4',500],
+    ['Kia','EV6','',2024,17900,'Électrique','Automatique','Électrique',5,5,'ev6',600]
   ];
-  const ins = db.prepare(`INSERT INTO vehicles(uid,brand,model,trim,year,plate,category,transmission,fuel,seats,doors,photos,description,price_day,price_week,price_month,deposit,manual_status,is_published,seed_demo,created_at,updated_at)
-    VALUES(?,?,?,?,?,NULL,?,?,?,?,?,?,?,?,?,?,?, 'none',1,1,?,?)`);
+  const ins = db.prepare(`INSERT INTO vehicles(uid,brand,model,trim,year,plate,category,transmission,fuel,seats,doors,photos,description,price_day,price_week,price_month,deposit,mileage,documents,manual_status,is_published,seed_demo,created_at,updated_at)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'none',1,1,?,?)`);
   fleet.forEach((f, i) => {
-    ins.run('NCV-' + String(i + 1).padStart(4, '0'), f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8],
-      JSON.stringify(['/assets/img/' + f[9] + '.webp']),
-      'Modèle présent dans les publications de l\u2019agence. Fiche de démonstration : immatriculation, année et prix exact à compléter par l\u2019administrateur.',
-      f[10], f[10] * 6, f[10] * 22, 5000, now, now);
+    ins.run('NCV-' + String(i + 1).padStart(4, '0'), f[0], f[1], f[2], f[3], 'DEMO-' + (1001 + i), f[5], f[6], f[7], f[8], f[9],
+      JSON.stringify(['/assets/img/' + f[10] + '.webp']),
+      'Véhicule de démonstration — fiche d\u2019exemple complète (modèle vu dans les publications de l\u2019agence ; caractéristiques et prix fictifs, à remplacer par les données réelles).',
+      f[11], f[11] * 6, f[11] * 22, 5000, f[4],
+      'Documents de démonstration : assurance et vignette fictives (exemples).', now, now);
   });
-  console.log('Seeded', fleet.length, 'demo vehicles (flagged seed_demo).');
-})();
+  const veh = uid => db.prepare('SELECT * FROM vehicles WHERE uid=?').get(uid);
+  const insB = db.prepare(`INSERT INTO bookings(ref,vehicle_id,customer_name,phone,email,pickup_at,return_at,location,extras,days,total,deposit_due,deposit_status,status,notes,created_at,updated_at)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`);
+  const sample = [
+    ['NC-DEMO-101','NCV-0001','Yasmine El Fassi (démo)','0600000011','yasmine.demo@exemple.ma',-10,-7,'Agence — Jirari 1',[],'completed','returned'],
+    ['NC-DEMO-102','NCV-0002','Omar Bennani (démo)','0600000012','omar.demo@exemple.ma',-2,2,'Aéroport Ibn Battouta',['GPS'],'active','paid'],
+    ['NC-DEMO-103','NCV-0004','Sara Amrani (démo)','0600000013','sara.demo@exemple.ma',-6,-1,'Agence — Jirari 1',['Siège bébé'],'active','paid'],
+    ['NC-DEMO-104','NCV-0003','Karim Haddad (démo)','0600000014','karim.demo@exemple.ma',3,6,'Port Tanger Ville',[],'confirmed','pending'],
+    ['NC-DEMO-105','NCV-0007','Lina Berrada (démo)','0600000015','lina.demo@exemple.ma',1,4,'Agence — Jirari 1',['Assurance tous risques'],'confirmed','pending'],
+    ['NC-DEMO-106','NCV-0005','Adam Chraïbi (démo)','0600000016','adam.demo@exemple.ma',2,5,'Aéroport Ibn Battouta',['GPS'],'pending','pending'],
+    ['NC-DEMO-107','NCV-0012','Yasmine El Fassi (démo)','0600000011','yasmine.demo@exemple.ma',-20,-18,'Agence — Jirari 1',[],'completed','returned'],
+    ['NC-DEMO-108','NCV-0012','Omar Bennani (démo)','0600000012','omar.demo@exemple.ma',10,12,'Agence — Jirari 1',[],'confirmed','pending']
+  ];
+  for (const s of sample) {
+    const v = veh(s[1]);
+    const from = dayAt(s[5]), to = dayAt(s[6]);
+    const days = rentalDays(from, to);
+    const ex = priceExtras(s[8], days);
+    const total = priceFor(v, days).total + ex.total;
+    insB.run(s[0], v.id, s[2], s[3], s[4], from, to, s[7], JSON.stringify(ex.items), days, total, v.deposit, s[10], s[9], 'Réservation d\u2019exemple (démonstration).', now, now);
+  }
+  const insM = db.prepare('INSERT INTO maintenance(vehicle_id,title,starts_at,ends_at,notes,done,created_at) VALUES(?,?,?,?,?,?,?)');
+  insM.run(veh('NCV-0009').id, 'Révision complète (démo)', dayAt(-1, 9), dayAt(3, 18), 'Exemple : véhicule actuellement en maintenance.', 0, now);
+  insM.run(veh('NCV-0011').id, 'Changement de pneus (démo)', dayAt(7, 9), dayAt(9, 18), 'Exemple de maintenance planifiée.', 0, now);
+  insM.run(veh('NCV-0006').id, 'Vidange (démo)', dayAt(-15, 9), dayAt(-14, 18), 'Exemple d\u2019historique de maintenance.', 1, now);
+  notify('booking_request', 'NC-DEMO-106', 'SEAT León · Adam Chraïbi (démo) — exemple de notification');
+  notify('booking_confirmed', 'NC-DEMO-104', 'Renault Captur · Karim Haddad (démo) — exemple de notification');
+  console.log('Seeded DEMO dataset:', fleet.length, 'vehicles,', sample.length, 'bookings, 3 maintenance entries.');
+}
+
 
 /* ---------- helpers ---------- */
 const nowISO = () => new Date().toISOString();
@@ -168,8 +201,8 @@ function findConflict(vehicle, start, end, excludeBookingId = 0) {
 }
 /* Derived live status at a given instant. */
 function liveStatus(vehicle, atISO = nowISO()) {
-  const active = db.prepare(`SELECT ref FROM bookings WHERE vehicle_id=? AND status='active' AND pickup_at<=? AND return_at>? LIMIT 1`).get(vehicle.id, atISO, atISO);
-  if (active) return { status: 'RENTED', detail: 'En location · ' + active.ref };
+  const active = db.prepare(`SELECT ref, return_at FROM bookings WHERE vehicle_id=? AND status='active' AND pickup_at<=? ORDER BY pickup_at LIMIT 1`).get(vehicle.id, atISO);
+  if (active) return { status: 'RENTED', detail: (active.return_at < atISO ? '⚠️ Retour en retard · ' : 'En location · ') + active.ref };
   const mt = db.prepare(`SELECT title FROM maintenance WHERE vehicle_id=? AND done=0 AND starts_at<=? AND ends_at>? LIMIT 1`).get(vehicle.id, atISO, atISO);
   if (mt || vehicle.manual_status === 'maintenance') return { status: 'MAINTENANCE', detail: mt ? mt.title : 'Au garage (manuel)' };
   if (vehicle.manual_status === 'unavailable') return { status: 'UNAVAILABLE', detail: 'Bloqué par l\u2019administrateur' };
@@ -227,6 +260,9 @@ function publicVehicle(v, range) {
   };
 }
 
+/* seed runs here: helpers (const nowISO etc.) are initialized by now */
+if (db.prepare('SELECT COUNT(*) c FROM vehicles').get().c === 0) seedDemoData();
+
 /* ---------- auth ---------- */
 const loginAttempts = new Map();
 function getSession(req) {
@@ -251,16 +287,16 @@ function badPrice(v) { return v === undefined || v === null || isNaN(+v) || +v <
 function createBooking(body) {
   const v = db.prepare('SELECT * FROM vehicles WHERE uid=? AND is_published=1').get(String(body.vehicle_uid || ''));
   if (!v) return { code: 404, error: 'vehicle_not_found', detail: 'Véhicule introuvable ou non publié' };
-  if (!isDT(body.pickup_at) || !isDT(body.return_at)) return { code: 400, error: 'invalid_dates' };
+  if (!isDT(body.pickup_at) || !isDT(body.return_at)) return { code: 400, error: 'invalid_dates', detail: 'Choisissez une date et une heure de départ et de retour.' };
   const days = rentalDays(body.pickup_at, body.return_at);
   if (days < 1) return { code: 400, error: 'invalid_range', detail: 'Le retour doit être après le départ (1 jour minimum)' };
-  if (new Date(body.pickup_at) < new Date(Date.now() - 3600e3)) return { code: 400, error: 'pickup_in_past' };
+  if (new Date(body.pickup_at) < new Date(Date.now() - 3600e3)) return { code: 400, error: 'pickup_in_past', detail: 'La date de départ est déjà passée — choisissez une date à venir.' };
   const name = String(body.customer_name || '').trim();
   const phone = String(body.phone || '').replace(/[\s-]/g, '');
   const email = String(body.email || '').trim();
-  if (name.length < 3) return { code: 400, error: 'invalid_name' };
-  if (!/^\+?\d{9,15}$/.test(phone)) return { code: 400, error: 'invalid_phone' };
-  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { code: 400, error: 'invalid_email' };
+  if (name.length < 3) return { code: 400, error: 'invalid_name', detail: 'Entrez votre nom complet (3 caractères minimum).' };
+  if (!/^\+?\d{9,15}$/.test(phone)) return { code: 400, error: 'invalid_phone', detail: 'Entrez un numéro de téléphone valide (ex. 06 XX XX XX XX).' };
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { code: 400, error: 'invalid_email', detail: 'Adresse email invalide — vérifiez le format.' };
   const mode = getSetting('confirmation_mode');
   const status = mode === 'auto' ? 'confirmed' : 'pending';
   /* Availability: transaction + recheck. Confirmed (auto) bookings must not overlap anything.
@@ -556,6 +592,16 @@ async function adminRoute(req, res, p, url, adminUser) {
     for (const k of ['confirmation_mode','whatsapp_number','agency_name','smtp_host','smtp_port','smtp_user','smtp_from']) if (b[k] !== undefined) setSetting(k, b[k]);
     if (b.extras_catalog !== undefined) setSetting('extras_catalog', JSON.stringify(b.extras_catalog));
     return json(res, 200, { ok: true });
+  }
+  /* demo reset: restores the canonical demo dataset; users, sessions and settings are preserved */
+  if (p === '/api/admin/reset-demo' && req.method === 'POST') {
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      db.exec('DELETE FROM bookings; DELETE FROM maintenance; DELETE FROM notifications; DELETE FROM vehicles;');
+      seedDemoData();
+      db.exec('COMMIT');
+    } catch (e) { try { db.exec('ROLLBACK'); } catch {} throw e; }
+    return json(res, 200, { ok: true, detail: 'Données de démonstration restaurées. Configuration et compte admin inchangés.' });
   }
   if (p === '/api/admin/notifications' && req.method === 'GET') {
     return json(res, 200, { notifications: db.prepare('SELECT * FROM notifications ORDER BY id DESC LIMIT 100').all() });

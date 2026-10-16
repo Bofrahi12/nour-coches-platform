@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """E2E workflow test — NOUR COCHES platform (mirrors the 9 steps in the spec)."""
-import json, sys, urllib.request, urllib.error, http.cookiejar
+import json, os, sys, urllib.request, urllib.error, http.cookiejar
 from datetime import datetime, timedelta
 
 BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8932'
-ADMIN_EMAIL, ADMIN_PASS = 'admin@nourcoches.ma', 'NourAdmin!2026'
+# Credentials come from the environment — never hardcoded in the repository.
+ADMIN_EMAIL = os.environ.get('NOUR_ADMIN_EMAIL', 'admin@nourcoches.ma')
+ADMIN_PASS = os.environ.get('NOUR_ADMIN_PASSWORD', '')
+if not ADMIN_PASS:
+    print('Set NOUR_ADMIN_PASSWORD to run this test.'); sys.exit(2)
 results = []
 def check(name, cond, detail=''):
     results.append((name, bool(cond), detail))
@@ -42,6 +46,16 @@ check('Wrong password rejected (401)', code == 401, code)
 # login
 code, r = call(opener, 'POST', '/api/auth/login', {'email': ADMIN_EMAIL, 'password': ADMIN_PASS})
 check('Admin login works', code == 200, r.get('email'))
+
+# 0b. Demo dataset coherence on the fresh seed (before any workflow data exists)
+code, stats = call(opener, 'GET', '/api/admin/stats')
+check('Demo stats: 12 vehicles total', stats['counts']['total'] == 12, stats['counts'])
+check('Demo stats: 2 RENTED (active bookings now)', stats['counts']['RENTED'] == 2, stats['counts'])
+check('Demo stats: 3 RESERVED (future confirmed)', stats['counts']['RESERVED'] == 3, stats['counts'])
+check('Demo stats: 1 MAINTENANCE (Tucson window)', stats['counts']['MAINTENANCE'] == 1, stats['counts'])
+check('Demo stats: overdue alert present (Golf)', len(stats['alerts']['overdue']) == 1 and 'Golf' in str(stats['alerts']['overdue']), stats['alerts']['overdue'])
+code, custs = call(opener, 'GET', '/api/admin/customers')
+check('Demo customers are fictional (démo)', len(custs['customers']) >= 5 and all('(démo)' in c['customer_name'] for c in custs['customers']), len(custs['customers']))
 
 # 1-3. Add Mercedes, set price, publish
 code, r = call(opener, 'POST', '/api/admin/vehicles', {
@@ -128,6 +142,18 @@ code, r = call(opener, 'PUT', f'/api/admin/vehicles/{vid}', {'is_published': Fal
 check('Test vehicle unpublished (cleanup)', code == 200)
 code, r = call(plain, 'GET', '/api/vehicles')
 check('Unpublished vehicle hidden from public fleet', all(v['uid'] != uid for v in r['vehicles']))
+
+# 8e. Reset restores the canonical demo dataset and preserves config + session
+code, before = call(opener, 'GET', '/api/admin/settings')
+code, r = call(opener, 'POST', '/api/admin/reset-demo', {})
+check('Reset demo data works', code == 200 and r.get('ok'), r)
+code, after = call(opener, 'GET', '/api/admin/stats')
+check('After reset: still logged in + 12 vehicles + 2 rented', code == 200 and after['counts']['total'] == 12 and after['counts']['RENTED'] == 2, after.get('counts'))
+code, vehs = call(opener, 'GET', '/api/admin/vehicles')
+check('After reset: workflow-test Mercedes is gone', all(v['plate'] != 'TEST-2026-MA' for v in vehs['vehicles']))
+code, bk = call(opener, 'GET', '/api/admin/bookings')
+refs = {b['ref'] for b in bk['bookings']}
+check('After reset: canonical demo bookings present', {'NC-DEMO-101', 'NC-DEMO-106'} <= refs, sorted(refs)[:4])
 
 # 9. password change works and old password dies
 code, r = call(opener, 'POST', '/api/admin/change-password', {'current_password': ADMIN_PASS, 'new_password': 'NewPass!2026'})
