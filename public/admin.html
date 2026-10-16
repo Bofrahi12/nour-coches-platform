@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — NOUR COCHES</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080a;--panel:#0d0f13;--panel2:#12151c;--line:#23262e;--acc:#f6a21e;--acc2:#ffc65c;--txt:#f4f1ea;--mut:#a7a294;--green:#22c064;--red:#ff8585}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:'Cairo',Tahoma,sans-serif}
+button{font-family:inherit;cursor:pointer}
+.btn{background:var(--acc);color:#231600;border:none;padding:10px 18px;border-radius:8px;font-weight:800;font-size:14.5px}
+.btn:hover{background:#d98a0b}.btn.ghost{background:transparent;border:1px solid #55565e;color:#fff}
+.btn.green{background:var(--green);color:#04240f}.btn.red{background:#5c2c2c;color:#ffb3b3}.btn.sm{padding:6px 11px;font-size:13px}
+input,select,textarea{width:100%;background:#171a20;border:1px solid #2c303a;color:#fff;border-radius:8px;padding:10px;font-family:inherit;font-size:14.5px;color-scheme:dark}
+label{font-size:11.5px;color:var(--mut);font-weight:700;letter-spacing:1px;display:block;margin-bottom:5px}
+#login{max-width:400px;margin:12vh auto;background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:32px}
+#login h1{font-size:24px;margin-bottom:6px}#login h1 b{color:var(--acc)}
+.err{color:var(--red);font-weight:700;font-size:14px;margin-top:10px;display:none}
+#app{display:none}
+.topbar{position:sticky;top:0;background:rgba(7,8,10,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:50}
+.topbar .in{max-width:1240px;margin:0 auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo{font-weight:900;font-size:19px}.logo b{color:var(--acc)}
+.tabs{max-width:1240px;margin:0 auto;padding:10px 18px 0;display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:9px 16px;border-radius:99px;font-weight:800;font-size:14px}
+.tabs button.on{background:var(--acc);color:#231600;border-color:var(--acc)}
+main{max-width:1240px;margin:0 auto;padding:22px 18px 80px}
+.view{display:none}.view.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:13px;margin-bottom:20px}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card b{font-size:31px;display:block;line-height:1.1}.card span{color:var(--mut);font-size:13px;font-weight:700}
+.alert{background:#1d1408;border:1px solid #4a3a12;border-radius:12px;padding:14px 17px;margin-bottom:12px;font-size:14.5px;line-height:1.7}
+.alert.red{background:#1d0d0d;border-color:#5c2c2c}
+.alert b{color:#ffd977}.alert.red b{color:#ffb3b3}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:10px 9px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+th{color:var(--mut);font-size:12px;letter-spacing:1px}
+.pill{font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.p-pending{background:#2b2108;color:#ffd977}.p-confirmed{background:#0d2b18;color:#7ddb9a}.p-active{background:#2b0d0d;color:#ffb3b3}
+.p-completed{background:#1c1f26;color:#c9cdd6}.p-cancelled{background:#1c1f26;color:#888}
+.p-AVAILABLE{background:#0d2b18;color:#7ddb9a}.p-RESERVED{background:#2b2108;color:#ffd977}.p-RENTED{background:#2b0d0d;color:#ffb3b3}.p-MAINTENANCE{background:#1d1430;color:#c9b8ff}.p-UNAVAILABLE{background:#1c1f26;color:#aaa}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.field{margin-bottom:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:flex-start;justify-content:center;z-index:100;overflow:auto;padding:20px 12px}
+.modal.on{display:flex}
+.modal .box{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:26px;max-width:760px;width:100%}
+.modal h2{margin-bottom:16px;font-size:21px}
+.searchrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.searchrow>*{flex:1;min-width:160px}
+.cal-item{background:var(--panel2);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:10px;padding:12px 15px;margin-bottom:9px;font-size:14px;line-height:1.65}
+.cal-item.maint{border-inline-start-color:#8f7bff}
+h2.sec{font-size:21px;margin:22px 0 12px}
+.note{color:var(--mut);font-size:13px;line-height:1.7}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}table,thead,tbody,tr,th,td{display:block}thead{display:none}tr{background:var(--panel2);border:1px solid var(--line);border-radius:12px;margin-bottom:11px;padding:8px}td{border:none;padding:6px 9px}}
+</style>
+</head>
+<body>
+<div id="login">
+  <h1>NOUR <b>COCHES</b> — Admin</h1>
+  <p class="note" style="margin-bottom:18px">Gestion de flotte & réservations. Accès réservé à l'administrateur.</p>
+  <div class="field"><label>EMAIL</label><input type="email" id="liEmail" autocomplete="username"></div>
+  <div class="field"><label>MOT DE PASSE</label><input type="password" id="liPass" autocomplete="current-password"></div>
+  <button class="btn" id="liBtn" style="width:100%">Se connecter</button>
+  <div class="err" id="liErr"></div>
+</div>
+
+<div id="app">
+  <div class="topbar"><div class="in">
+    <span class="logo">NOUR <b>COCHES</b> · Admin</span>
+    <span><span id="who" class="note"></span> <button class="btn ghost sm" id="logoutBtn">Déconnexion</button></span>
+  </div>
+  <div class="tabs" id="tabs">
+    <button data-v="dash" class="on">Aperçu</button><button data-v="vehicles">Véhicules</button><button data-v="bookings">Réservations</button>
+    <button data-v="calendar">Calendrier</button><button data-v="customers">Clients</button><button data-v="maint">Maintenance</button>
+    <button data-v="reports">Rapports</button><button data-v="notifs">Notifications</button><button data-v="settings">Paramètres</button>
+  </div></div>
+  <main>
+    <section class="view on" id="v-dash"></section>
+    <section class="view" id="v-vehicles"></section>
+    <section class="view" id="v-bookings"></section>
+    <section class="view" id="v-calendar"></section>
+    <section class="view" id="v-customers"></section>
+    <section class="view" id="v-maint"></section>
+    <section class="view" id="v-reports"></section>
+    <section class="view" id="v-notifs"></section>
+    <section class="view" id="v-settings"></section>
+  </main>
+</div>
+
+<div class="modal" id="vModal"><div class="box">
+  <h2 id="vmTitle">Véhicule</h2>
+  <div class="grid3">
+    <div class="field"><label>MARQUE *</label><input id="vm_brand"></div>
+    <div class="field"><label>MODÈLE *</label><input id="vm_model"></div>
+    <div class="field"><label>FINITION / TRIM</label><input id="vm_trim"></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label>ANNÉE</label><input id="vm_year" type="number"></div>
+    <div class="field"><label>IMMATRICULATION (unique)</label><input id="vm_plate"></div>
+    <div class="field"><label>CATÉGORIE</label><input id="vm_category"></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label>BOÎTE</label><select id="vm_transmission"><option>Manuelle</option><option>Automatique</option></select></div>
+    <div class="field"><label>CARBURANT</label><select id="vm_fuel"><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>
+    <div class="field"><label>KILOMÉTRAGE</label><input id="vm_mileage" type="number"></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label>PLACES</label><input id="vm_seats" type="number"></div>
+    <div class="field"><label>PORTES</label><input id="vm_doors" type="number"></div>
+    <div class="field"><label>STATUT MANUEL</label><select id="vm_manual_status"><option value="none">Aucun (automatique)</option><option value="maintenance">Maintenance</option><option value="unavailable">Indisponible / bloqué</option></select></div>
+  </div>
+  <div class="grid3">
+    <div class="field"><label>PRIX / JOUR (MAD) *</label><input id="vm_price_day" type="number"></div>
+    <div class="field"><label>PRIX / SEMAINE</label><input id="vm_price_week" type="number"></div>
+    <div class="field"><label>PRIX / MOIS</label><input id="vm_price_month" type="number"></div>
+  </div>
+  <div class="grid2">
+    <div class="field"><label>CAUTION (MAD)</label><input id="vm_deposit" type="number"></div>
+    <div class="field"><label>PUBLIÉ SUR LE SITE</label><select id="vm_is_published"><option value="1">Oui</option><option value="0">Non</option></select></div>
+  </div>
+  <div class="field"><label>PHOTOS (URLs, une par ligne)</label><textarea id="vm_photos" rows="2"></textarea></div>
+  <div class="field"><label>DESCRIPTION</label><textarea id="vm_description" rows="2"></textarea></div>
+  <div class="field"><label>DOCUMENTS & NOTES PRIVÉES (jamais publics)</label><textarea id="vm_documents" rows="2" placeholder="Assurance jusqu'au…, vignette, visite technique…"></textarea></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="vmSave">Enregistrer</button><button class="btn ghost" id="vmCancel">Annuler</button></div>
+  <div class="err" id="vmErr"></div>
+</div></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var VEH=[], curEdit=null;
+  function api(path,method,body){return fetch(path,{method:method||'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}).then(function(r){return r.json().then(function(d){return{ok:r.ok,code:r.status,d:d};});});}
+  function fmt(iso){return iso?new Date(iso).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';}
+  function pill(s){return '<span class="pill p-'+s+'">'+s+'</span>';}
+  /* login */
+  $('liBtn').addEventListener('click',doLogin);
+  $('liPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+  function doLogin(){
+    api('/api/auth/login','POST',{email:$('liEmail').value,password:$('liPass').value}).then(function(x){
+      if(!x.ok){$('liErr').textContent='Identifiants incorrects.';$('liErr').style.display='block';return;}
+      showApp(x.d.email);
+    });
+  }
+  function showApp(email){$('login').style.display='none';$('app').style.display='block';$('who').textContent=email||'';loadAll();}
+  $('logoutBtn').addEventListener('click',function(){api('/api/auth/logout','POST').then(function(){location.reload();});});
+  api('/api/auth/me').then(function(x){if(x.ok)showApp(x.d.email);});
+  /* tabs */
+  $('tabs').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    this.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+    document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+    $('v-'+b.dataset.v).classList.add('on');});
+  function loadAll(){loadDash();loadVehicles();loadBookings();loadCalendar();loadCustomers();loadMaint();loadReports();loadNotifs();loadSettings();}
+  /* dashboard */
+  function loadDash(){
+    api('/api/admin/stats').then(function(x){if(!x.ok)return;var s=x.d,c=s.counts;
+      var alerts='';
+      s.alerts.overdue.forEach(function(o){alerts+='<div class="alert red">⏰ <b>Retour en retard</b> — '+o.brand+' '+o.model+' · '+o.ref+' · '+o.customer_name+' ('+o.phone+') · retour prévu '+fmt(o.return_at)+'</div>';});
+      s.alerts.pickups_24h.forEach(function(o){alerts+='<div class="alert">🔑 <b>Départ sous 24h</b> — '+o.brand+' '+o.model+' · '+o.ref+' · '+o.customer_name+' · '+fmt(o.pickup_at)+'</div>';});
+      s.alerts.maintenance_ending.forEach(function(o){alerts+='<div class="alert">🔧 <b>Maintenance bientôt terminée</b> — '+o.brand+' '+o.model+' · '+o.title+' · fin '+fmt(o.ends_at)+'</div>';});
+      if(s.alerts.incomplete_vehicles.length)alerts+='<div class="alert">📋 <b>Fiches de démonstration à compléter</b> (immatriculation / année manquants) : '+s.alerts.incomplete_vehicles.join(' · ')+'<br><span class="note">Ces véhicules viennent du site vitrine : complétez leur fiche avant de les considérer comme un stock réel.</span></div>';
+      $('v-dash').innerHTML='<div class="cards">'
+      +'<div class="card"><b>'+c.total+'</b><span>Véhicules au total</span></div>'
+      +'<div class="card"><b style="color:#7ddb9a">'+c.AVAILABLE+'</b><span>Disponibles</span></div>'
+      +'<div class="card"><b style="color:#ffb3b3">'+c.RENTED+'</b><span>En location</span></div>'
+      +'<div class="card"><b style="color:#ffd977">'+c.RESERVED+'</b><span>Réservés</span></div>'
+      +'<div class="card"><b style="color:#c9b8ff">'+c.MAINTENANCE+'</b><span>Maintenance</span></div>'
+      +'<div class="card"><b>'+s.active_bookings+'</b><span>Réservations ouvertes</span></div>'
+      +'<div class="card"><b>'+s.revenue_total+' MAD</b><span>Revenu (en cours + terminé)</span></div></div>'
+      +alerts
+      +'<h2 class="sec">Prochains retours</h2>'+(s.upcoming_returns.length?s.upcoming_returns.map(function(r){return '<div class="cal-item">🔁 <b>'+r.brand+' '+r.model+'</b> · '+r.ref+' · retour '+fmt(r.return_at)+'</div>';}).join(''):'<p class="note">Aucun retour à venir.</p>');
+    });
+  }
+  /* vehicles */
+  function loadVehicles(){
+    api('/api/admin/vehicles').then(function(x){if(!x.ok)return;VEH=x.d.vehicles;
+      $('v-vehicles').innerHTML='<div class="searchrow"><input id="vq" placeholder="Rechercher (marque, modèle, immatriculation)…"><button class="btn" id="vAdd">+ Ajouter un véhicule</button></div>'
+      +'<table><thead><tr><th>Véhicule</th><th>Immat.</th><th>Prix j/sem/mois</th><th>Caution</th><th>Statut en direct</th><th>Publié</th><th>Actions</th></tr></thead><tbody id="vBody"></tbody></table>';
+      var render=function(){
+        var q=($('vq').value||'').toLowerCase();
+        $('vBody').innerHTML=VEH.filter(function(v){return !q||(v.brand+' '+v.model+' '+(v.plate||'')).toLowerCase().includes(q);}).map(function(v){
+          return '<tr><td><b>'+v.brand+' '+v.model+' '+v.trim+'</b><br><span class="note">'+v.uid+' · '+(v.year||'année ?')+' · '+v.transmission+' · '+v.fuel+' · '+v.mileage+' km</span></td>'
+          +'<td>'+(v.plate||'<span style="color:#ffd977">à compléter</span>')+'</td>'
+          +'<td>'+v.price_day+' / '+v.price_week+' / '+v.price_month+' MAD</td><td>'+v.deposit+' MAD</td>'
+          +'<td>'+pill(v.live.status)+'<br><span class="note">'+v.live.detail+'</span>'+(v.manual_status!=='none'?'<br><span class="note">manuel : '+v.manual_status+'</span>':'')+'</td>'
+          +'<td>'+(v.is_published?'✅':'🚫')+'</td>'
+          +'<td><div class="rowbtns"><button class="btn sm ghost" data-edit="'+v.id+'">Modifier</button><button class="btn sm red" data-del="'+v.id+'">Supprimer</button></div></td></tr>';
+        }).join('');
+      };
+      render();
+      $('vq').addEventListener('input',render);
+      $('vAdd').addEventListener('click',function(){openVehicle(null);});
+      $('vBody').addEventListener('click',function(e){
+        var ed=e.target.closest('[data-edit]'),del=e.target.closest('[data-del]');
+        if(ed)openVehicle(VEH.find(function(v){return v.id===+ed.dataset.edit;}));
+        if(del&&confirm('Supprimer ce véhicule ? (impossible si des réservations sont ouvertes)')){
+          api('/api/admin/vehicles/'+del.dataset.del,'DELETE').then(function(x){if(!x.ok)alert(x.d.detail||x.d.error);loadVehicles();loadDash();});
+        }
+      });
+    });
+  }
+  function openVehicle(v){
+    curEdit=v;
+    $('vmTitle').textContent=v?('Modifier — '+v.brand+' '+v.model):'Nouveau véhicule';
+    var F=function(id,val){$(id).value=val??'';};
+    F('vm_brand',v?v.brand:'');F('vm_model',v?v.model:'');F('vm_trim',v?v.trim:'');F('vm_year',v?v.year:'');F('vm_plate',v?v.plate:'');
+    F('vm_category',v?v.category:'');F('vm_transmission',v?v.transmission:'Manuelle');F('vm_fuel',v?v.fuel:'Essence');
+    F('vm_mileage',v?v.mileage:0);F('vm_seats',v?v.seats:5);F('vm_doors',v?v.doors:5);
+    F('vm_manual_status',v?v.manual_status:'none');F('vm_price_day',v?v.price_day:'');F('vm_price_week',v?v.price_week:'');F('vm_price_month',v?v.price_month:'');
+    F('vm_deposit',v?v.deposit:5000);F('vm_is_published',v?(v.is_published?'1':'0'):'1');
+    F('vm_photos',v?v.photos.join('\n'):'/assets/img/hero.webp');F('vm_description',v?v.description:'');F('vm_documents',v?v.documents:'');
+    $('vmErr').style.display='none';
+    $('vModal').classList.add('on');
+  }
+  $('vmCancel').addEventListener('click',function(){$('vModal').classList.remove('on');});
+  $('vmSave').addEventListener('click',function(){
+    var body={brand:$('vm_brand').value,model:$('vm_model').value,trim:$('vm_trim').value,year:$('vm_year').value?+$('vm_year').value:null,
+      plate:$('vm_plate').value||null,category:$('vm_category').value,transmission:$('vm_transmission').value,fuel:$('vm_fuel').value,
+      mileage:+$('vm_mileage').value||0,seats:+$('vm_seats').value||5,doors:+$('vm_doors').value||5,manual_status:$('vm_manual_status').value,
+      price_day:+$('vm_price_day').value,price_week:+$('vm_price_week').value||0,price_month:+$('vm_price_month').value||0,
+      deposit:+$('vm_deposit').value||0,is_published:$('vm_is_published').value==='1',
+      photos:$('vm_photos').value.split('\n').map(function(s){return s.trim();}).filter(Boolean),
+      description:$('vm_description').value,documents:$('vm_documents').value};
+    var req=curEdit?api('/api/admin/vehicles/'+curEdit.id,'PUT',body):api('/api/admin/vehicles','POST',body);
+    req.then(function(x){
+      if(!x.ok){$('vmErr').textContent=(x.d.detail||x.d.error||'Erreur');$('vmErr').style.display='block';return;}
+      if(x.d.warning)alert(x.d.warning);
+      $('vModal').classList.remove('on');loadVehicles();loadDash();
+    });
+  });
+  /* bookings */
+  function loadBookings(){
+    api('/api/admin/bookings').then(function(x){if(!x.ok)return;
+      $('v-bookings').innerHTML='<div class="searchrow"><input id="bq" placeholder="Rechercher (réf, client, téléphone)…"><select id="bStatus"><option value="">Tous statuts</option><option>pending</option><option>confirmed</option><option>active</option><option>completed</option><option>cancelled</option></select></div>'
+      +'<table><thead><tr><th>Réf</th><th>Véhicule</th><th>Client</th><th>Période</th><th>Total / caution</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="bBody"></tbody></table>';
+      var all=x.d.bookings;
+      var render=function(){
+        var q=($('bq').value||'').toLowerCase(),st=$('bStatus').value;
+        $('bBody').innerHTML=all.filter(function(b){return (!st||b.status===st)&&(!q||(b.ref+' '+b.customer_name+' '+b.phone).toLowerCase().includes(q));}).map(function(b){
+          var acts='';
+          if(b.status==='pending')acts+='<button class="btn sm green" data-act="confirm" data-id="'+b.id+'">Confirmer</button>';
+          if(b.status==='confirmed')acts+='<button class="btn sm" data-act="pickup" data-id="'+b.id+'">Départ (pickup)</button>';
+          if(b.status==='active')acts+='<button class="btn sm green" data-act="complete" data-id="'+b.id+'">Retour (terminer)</button>';
+          if(['confirmed','active'].includes(b.status))acts+='<button class="btn sm ghost" data-act="extend" data-id="'+b.id+'">Prolonger</button>';
+          if(['pending','confirmed','active'].includes(b.status))acts+='<button class="btn sm red" data-act="cancel" data-id="'+b.id+'">Annuler</button>';
+          return '<tr><td><b>'+b.ref+'</b><br><span class="note">'+new Date(b.created_at).toLocaleDateString('fr-FR')+'</span></td>'
+          +'<td>'+b.brand+' '+b.model+'<br><span class="note">'+b.vehicle_uid+'</span></td>'
+          +'<td>'+b.customer_name+'<br><span class="note">'+b.phone+(b.email?'<br>'+b.email:'')+'</span></td>'
+          +'<td>'+fmt(b.pickup_at)+' →<br>'+fmt(b.return_at)+'<br><span class="note">'+b.days+' j · '+b.location+'</span></td>'
+          +'<td><b>'+b.total+' MAD</b><br><span class="note">caution '+b.deposit_due+' ('+b.deposit_status+')</span></td>'
+          +'<td>'+pill(b.status)+'</td><td><div class="rowbtns">'+acts+'</div></td></tr>';
+        }).join('')||'<tr><td colspan="7" class="note">Aucune réservation.</td></tr>';
+      };
+      render();
+      $('bq').addEventListener('input',render);$('bStatus').addEventListener('change',render);
+      $('bBody').addEventListener('click',function(e){
+        var btn=e.target.closest('[data-act]');if(!btn)return;
+        var id=btn.dataset.id,act=btn.dataset.act;
+        if(act==='extend'){
+          var cur=all.find(function(b){return b.id===+id;});
+          var nd=prompt('Nouvelle date/heure de retour (AAAA-MM-JJTHH:MM) :',cur.return_at.slice(0,16));
+          if(!nd)return;
+          api('/api/admin/bookings/'+id+'/extend','POST',{new_return_at:nd}).then(function(x){alert(x.ok?('Prolongée — nouveau total '+x.d.total+' MAD'):('Refusé : '+(x.d.detail||x.d.error)));loadBookings();loadDash();});
+          return;
+        }
+        if(act==='cancel'&&!confirm('Annuler cette réservation ?'))return;
+        api('/api/admin/bookings/'+id+'/'+act,'POST',{}).then(function(x){if(!x.ok)alert(x.d.detail||x.d.error);loadBookings();loadDash();loadCalendar();});
+      });
+    });
+  }
+  /* calendar */
+  function loadCalendar(){
+    api('/api/admin/calendar').then(function(x){if(!x.ok)return;
+      var h='<h2 class="sec">Réservations par véhicule (ouvertes)</h2>';
+      var byV={};
+      x.d.bookings.forEach(function(b){(byV[b.vehicle_uid]=byV[b.vehicle_uid]||[]).push(b);});
+      Object.keys(byV).sort().forEach(function(uid){
+        h+='<h3 style="margin:14px 0 8px">'+uid+' — '+byV[uid][0].brand+' '+byV[uid][0].model+'</h3>';
+        byV[uid].forEach(function(b){h+='<div class="cal-item">'+pill(b.status)+' <b>'+b.ref+'</b> · '+b.customer_name+' · '+fmt(b.pickup_at)+' → '+fmt(b.return_at)+'</div>';});
+      });
+      h+='<h2 class="sec">Fenêtres de maintenance</h2>';
+      x.d.maintenance.forEach(function(m){h+='<div class="cal-item maint">🔧 <b>'+m.vehicle_uid+' '+m.brand+' '+m.model+'</b> · '+m.title+' · '+fmt(m.starts_at)+' → '+fmt(m.ends_at)+'</div>';});
+      $('v-calendar').innerHTML=h||'<p class="note">Rien de planifié.</p>';
+    });
+  }
+  /* customers */
+  function loadCustomers(){
+    api('/api/admin/customers').then(function(x){if(!x.ok)return;
+      $('v-customers').innerHTML='<table><thead><tr><th>Client</th><th>Téléphone</th><th>Email</th><th>Réservations</th><th>Dépensé</th><th>Dernier contact</th></tr></thead><tbody>'
+      +x.d.customers.map(function(c){return '<tr><td><b>'+c.customer_name+'</b></td><td>'+c.phone+'</td><td>'+(c.email||'—')+'</td><td>'+c.bookings_count+'</td><td>'+c.spent+' MAD</td><td>'+new Date(c.last_booking).toLocaleDateString('fr-FR')+'</td></tr>';}).join('')
+      +'</tbody></table>';
+    });
+  }
+  /* maintenance */
+  function loadMaint(){
+    api('/api/admin/maintenance').then(function(x){if(!x.ok)return;
+      var opts=VEH.map(function(v){return '<option value="'+v.id+'">'+v.brand+' '+v.model+' ('+v.uid+')</option>';}).join('');
+      $('v-maint').innerHTML='<div class="grid2"><div class="field"><label>VÉHICULE</label><select id="mVeh">'+opts+'</select></div>'
+      +'<div class="field"><label>TITRE</label><input id="mTitle" placeholder="Vidange, pneus, réparation…"></div></div>'
+      +'<div class="grid2"><div class="field"><label>DÉBUT</label><input id="mFrom" type="datetime-local"></div><div class="field"><label>FIN</label><input id="mTo" type="datetime-local"></div></div>'
+      +'<div class="field"><label>NOTES</label><input id="mNotes"></div>'
+      +'<button class="btn" id="mAdd">Planifier la maintenance</button><div class="err" id="mErr"></div>'
+      +'<h2 class="sec">Historique & planifié</h2>'
+      +x.d.maintenance.map(function(m){return '<div class="cal-item maint">🔧 <b>'+m.brand+' '+m.model+'</b> · '+m.title+' · '+fmt(m.starts_at)+' → '+fmt(m.ends_at)+' '+(m.done?'✔️ terminé':'')+' <span style="float:inline-end"><button class="btn sm ghost" data-mdone="'+m.id+'" data-done="'+(m.done?0:1)+'">'+(m.done?'Rouvrir':'Marquer terminé')+'</button> <button class="btn sm red" data-mdel="'+m.id+'">Supprimer</button></span><br><span class="note">'+(m.notes||'')+'</span></div>';}).join('');
+      $('mAdd').addEventListener('click',function(){
+        api('/api/admin/maintenance','POST',{vehicle_id:+$('mVeh').value,title:$('mTitle').value,starts_at:$('mFrom').value,ends_at:$('mTo').value,notes:$('mNotes').value}).then(function(x){
+          if(!x.ok){$('mErr').textContent=x.d.detail||x.d.error;$('mErr').style.display='block';return;}
+          loadMaint();loadDash();loadCalendar();
+        });
+      });
+      $('v-maint').querySelectorAll('[data-mdone]').forEach(function(b){b.addEventListener('click',function(){api('/api/admin/maintenance/'+b.dataset.mdone,'PUT',{done:b.dataset.done==='1'}).then(loadMaint);});});
+      $('v-maint').querySelectorAll('[data-mdel]').forEach(function(b){b.addEventListener('click',function(){api('/api/admin/maintenance/'+b.dataset.mdel,'DELETE').then(loadMaint);});});
+    });
+  }
+  /* reports */
+  function loadReports(){
+    api('/api/admin/reports').then(function(x){if(!x.ok)return;
+      $('v-reports').innerHTML='<h2 class="sec">Revenu par mois</h2>'
+      +(x.d.revenue_by_month.map(function(r){return '<div class="cal-item">📈 <b>'+r.month+'</b> · '+r.bookings+' locations · <b>'+r.revenue+' MAD</b></div>';}).join('')||'<p class="note">Aucun revenu pour le moment.</p>')
+      +'<h2 class="sec">Utilisation par véhicule</h2>'
+      +x.d.utilization.map(function(u){return '<div class="cal-item">🚗 <b>'+u.vehicle+'</b> ('+u.uid+') · '+u.rented_days_total+' jours loués · '+u.bookings+' réservations</div>';}).join('')
+      +'<h2 class="sec">Cautions</h2>'
+      +x.d.deposits.map(function(d){return '<div class="cal-item">💰 '+d.deposit_status+' : '+d.c+' réservation(s) · '+d.s+' MAD</div>';}).join('');
+    });
+  }
+  /* notifications */
+  function loadNotifs(){
+    api('/api/admin/notifications').then(function(x){if(!x.ok)return;
+      $('v-notifs').innerHTML='<p class="note" style="margin-bottom:14px">Chaque événement crée une notification. WhatsApp = lien prêt à envoyer (jamais prétendu automatique). Email = seulement si le SMTP est configuré dans Paramètres.</p>'
+      +x.d.notifications.map(function(n){return '<div class="cal-item">✉️ <b>'+n.type+'</b> · '+n.channel+' · <span class="pill p-'+(n.status==='not_configured'?'cancelled':'confirmed')+'">'+n.status+'</span> '+(n.booking_ref?'· '+n.booking_ref:'')+'<br><span class="note">'+n.detail+' · '+new Date(n.created_at).toLocaleString('fr-FR')+'</span></div>';}).join('');
+    });
+  }
+  /* settings */
+  function loadSettings(){
+    api('/api/admin/settings').then(function(x){if(!x.ok)return;var s=x.d;
+      $('v-settings').innerHTML='<div class="grid2">'
+      +'<div class="field"><label>MODE DE CONFIRMATION</label><select id="st_mode"><option value="manual">Manuel — demande puis validation admin</option><option value="auto">Automatique — confirmation immédiate si disponible</option></select></div>'
+      +'<div class="field"><label>WHATSAPP DE L\u2019AGENCE</label><input id="st_wa"></div></div>'
+      +'<div class="grid2"><div class="field"><label>NOM DE L\u2019AGENCE</label><input id="st_name"></div>'
+      +'<div class="field"><label>SMTP HOST (vide = email désactivé)</label><input id="st_host" placeholder="smtp.gmail.com"></div></div>'
+      +'<div class="grid3"><div class="field"><label>SMTP PORT</label><input id="st_port"></div><div class="field"><label>SMTP USER</label><input id="st_user"></div><div class="field"><label>SMTP FROM</label><input id="st_from"></div></div>'
+      +'<div class="field"><label>CATALOGUE D\u2019OPTIONS (JSON : [{"name":"GPS","price":30},…])</label><textarea id="st_extras" rows="3"></textarea></div>'
+      +'<button class="btn" id="stSave">Enregistrer les paramètres</button> <span class="note" id="stMsg"></span>'
+      +'<p class="note" style="margin-top:16px">Sécurité : les mots de passe SMTP ne sont jamais demandés ici — configurez-les côté serveur (variables d\u2019environnement) lors du déploiement.</p>'
+      +'<h2 class="sec">Changer le mot de passe admin</h2><div class="grid2"><div class="field"><label>ACTUEL</label><input type="password" id="pw_cur"></div><div class="field"><label>NOUVEAU (8+ caractères)</label><input type="password" id="pw_new"></div></div><button class="btn ghost" id="pwBtn">Changer le mot de passe</button> <span class="note" id="pwMsg"></span>';
+      $('pwBtn').addEventListener('click',function(){
+        api('/api/admin/change-password','POST',{current_password:$('pw_cur').value,new_password:$('pw_new').value}).then(function(x){$('pwMsg').textContent=x.ok?'✅ Mot de passe changé':'⚠️ '+(x.d.detail||x.d.error);});
+      });
+      $('st_mode').value=s.confirmation_mode;$('st_wa').value=s.whatsapp_number;$('st_name').value=s.agency_name;
+      $('st_host').value=s.smtp_host;$('st_port').value=s.smtp_port;$('st_user').value=s.smtp_user;$('st_from').value=s.smtp_from;
+      $('st_extras').value=JSON.stringify(s.extras_catalog);
+      $('stSave').addEventListener('click',function(){
+        var extras; try{extras=JSON.parse($('st_extras').value);}catch(e){alert('JSON des options invalide');return;}
+        api('/api/admin/settings','PUT',{confirmation_mode:$('st_mode').value,whatsapp_number:$('st_wa').value,agency_name:$('st_name').value,smtp_host:$('st_host').value,smtp_port:$('st_port').value,smtp_user:$('st_user').value,smtp_from:$('st_from').value,extras_catalog:extras}).then(function(){$('stMsg').textContent='✅ Enregistré';});
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

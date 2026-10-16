@@ -1,0 +1,1 @@
+{"description":"NOUR COCHES — plateforme de gestion de flotte et de réservation (Tanger)","engines":{"node":">=22"},"name":"nour-coches-platform","private":true,"scripts":{"start":"node server.js"},"type":"commonjs","version":"1.0.0"}
