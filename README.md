@@ -33,7 +33,7 @@ The password can later be changed from Admin → Paramètres.
 - `confirmation_mode`: `manual` (request → admin confirms) or `auto`
   (instant confirmation if the range is free). Availability is re-checked
   server-side at creation **and** at confirmation, inside a transaction.
-- WhatsApp number: notifications prepare a wa.me deep link (honest model — a human
+- WhatsApp number: the demo contact is `+212 675-721413`; notifications prepare a wa.me deep link (honest model — a human
   sends it; nothing is claimed auto-sent). Email notifications are logged as
   `not_configured` until SMTP host/user are set.
 

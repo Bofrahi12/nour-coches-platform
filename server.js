@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
 /* ---------- settings ---------- */
 const DEFAULT_SETTINGS = {
   confirmation_mode: 'manual',           // 'manual' (request -> admin confirms) | 'auto'
-  whatsapp_number: '212608028793',       // agency WhatsApp (public, from its own posts)
+  whatsapp_number: '212675721413',       // agency WhatsApp (public contact supplied for this demo)
   agency_name: 'NOUR COCHES',
   agency_city: 'Jirari 1, Tanger',
   smtp_host: '', smtp_port: '587', smtp_user: '', smtp_from: '',   // empty = email not configured
